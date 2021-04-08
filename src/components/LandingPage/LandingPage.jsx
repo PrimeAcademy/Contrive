@@ -1,68 +1,161 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import './LandingPage.css';
+import React, { useState, useEffect, useRef } from "react";
+import styled from "styled-components";
+import io from "socket.io-client";
 
-// CUSTOM COMPONENTS
-import RegisterForm from '../RegisterForm/RegisterForm';
+const Page = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  align-items: center;
+  background-color: #46516e;
+  flex-direction: column;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  max-height: 500px;
+  overflow: auto;
+  width: 400px;
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding-bottom: 10px;
+  margin-top: 25px;
+`;
+
+const TextArea = styled.textarea`
+  width: 98%;
+  height: 100px;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
+  font-size: 17px;
+  background-color: transparent;
+  border: 1px solid lightgray;
+  outline: none;
+  color: lightgray;
+  letter-spacing: 1px;
+  line-height: 20px;
+  ::placeholder {
+    color: lightgray;
+  }
+`;
+
+const Button = styled.button`
+  background-color: pink;
+  width: 100%;
+  border: none;
+  height: 50px;
+  border-radius: 10px;
+  color: #46516e;
+  font-size: 17px;
+`;
+
+const Form = styled.form`
+  width: 400px;
+`;
+
+const MyRow = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+`;
+
+const MyMessage = styled.div`
+  width: 45%;
+  background-color: pink;
+  color: #46516e;
+  padding: 10px;
+  margin-right: 5px;
+  text-align: center;
+  border-top-right-radius: 10%;
+  border-bottom-right-radius: 10%;
+`;
+
+const PartnerRow = styled(MyRow)`
+  justify-content: flex-start;
+`;
+
+const PartnerMessage = styled.div`
+  width: 45%;
+  background-color: transparent;
+  color: lightgray;
+  border: 1px solid lightgray;
+  padding: 10px;
+  margin-left: 5px;
+  text-align: center;
+  border-top-left-radius: 10%;
+  border-bottom-left-radius: 10%;
+`;
 
 function LandingPage() {
-  const [heading, setHeading] = useState('Welcome');
-  const history = useHistory();
+  const [yourId, setYourId] = useState();
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
 
-  const onLogin = (event) => {
-    history.push('/login');
-  };
+  const socketRef = useRef();
+
+  useEffect(() => {
+    socketRef.current = io.connect("http://localhost:4000");
+
+    socketRef.current.on("your id", (id) => {
+      setYourId(id);
+    });
+
+    socketRef.current.on("message", (message) => {
+      console.log("here");
+      receiveMessage(message);
+    });
+  }, []);
+
+  function receiveMessage(message) {
+    setMessages((oldMessages) => [...oldMessages, message]);
+  }
+
+  function sendMessage(evt) {
+    evt.preventDefault();
+    const messageObject = {
+      body: message,
+      id: yourId,
+    };
+    setMessage("");
+    socketRef.current.emit("send message", messageObject);
+  }
+
+  function handleChange(evt) {
+    setMessage(evt.target.value);
+  }
 
   return (
-    <div className="container">
-      <h2>{heading}</h2>
-
-      <div className="grid">
-        <div className="grid-col grid-col_8">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
-            id felis metus. Vestibulum et pulvinar tortor. Morbi pharetra lacus
-            ut ex molestie blandit. Etiam et turpis sit amet risus mollis
-            interdum. Suspendisse et justo vitae metus bibendum fringilla sed
-            sed justo. Aliquam sollicitudin dapibus lectus, vitae consequat odio
-            elementum eget. Praesent efficitur eros vitae nunc interdum, eu
-            interdum justo facilisis. Sed pulvinar nulla ac dignissim efficitur.
-            Quisque eget eros metus. Vestibulum bibendum fringilla nibh a
-            luctus. Duis a sapien metus.
-          </p>
-
-          <p>
-            Praesent consectetur orci dui, id elementum eros facilisis id. Sed
-            id dolor in augue porttitor faucibus eget sit amet ante. Nunc
-            consectetur placerat pharetra. Aenean gravida ex ut erat commodo, ut
-            finibus metus facilisis. Nullam eget lectus non urna rhoncus
-            accumsan quis id massa. Curabitur sit amet dolor nisl. Proin
-            euismod, augue at condimentum rhoncus, massa lorem semper lacus, sed
-            lobortis augue mi vel felis. Duis ultrices sapien at est convallis
-            congue.
-          </p>
-
-          <p>
-            Fusce porta diam ac tortor elementum, ut imperdiet metus volutpat.
-            Suspendisse posuere dapibus maximus. Aliquam vitae felis libero. In
-            vehicula sapien at semper ultrices. Vivamus sed feugiat libero. Sed
-            sagittis neque id diam euismod, ut egestas felis ultricies. Nullam
-            non fermentum mauris. Sed in enim ac turpis faucibus pretium in sit
-            amet nisi.
-          </p>
-        </div>
-        <div className="grid-col grid-col_4">
-          <RegisterForm />
-
-          <center>
-            <h4>Already a Member?</h4>
-            <button className="btn btn_sizeSm" onClick={onLogin}>
-              Login
-            </button>
-          </center>
-        </div>
-      </div>
-    </div>
+    <Page>
+      <Container>
+        {messages.map((message) => {
+          if (message.id === yourId) {
+            return (
+              <MyRow key={index}>
+                <MyMessage>{message.body}</MyMessage>
+              </MyRow>
+            );
+          }
+          return (
+            <PartnerRow key={index}>
+              <PartnerMessage>{message.body}</PartnerMessage>
+            </PartnerRow>
+          );
+        })}
+      </Container>
+      <Form onSubmit={sendMessage}>
+        <TextArea
+          value={message}
+          onChange={handleChange}
+          placeholder="Say something"
+        ></TextArea>
+        <Button>Send</Button>
+      </Form>
+    </Page>
   );
 }
 
