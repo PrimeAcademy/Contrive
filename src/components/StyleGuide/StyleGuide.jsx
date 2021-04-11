@@ -1,23 +1,6 @@
 // Material-UI Themes (style sheet)
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
-// Material-UI Components
-import {
-  Button, // replaces html5 <button> element
-  ButtonGroup,
-  FormControl,
-  FormHelperText,
-  Grid, //
-  Input,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-  Typography, // replace html5 elements dealing with text, <h1>, <h2>, <h3>, <p>, etc...
-
-} from '@material-ui/core';
-
 import MaterialExamples from './MaterialExamples';
 
 /**
@@ -60,7 +43,7 @@ const theme = createMuiTheme({
     ].join(','),
     align: 'justify'
   },
-
+  spacing: 10
 });
 
 function StyleGuide() {
