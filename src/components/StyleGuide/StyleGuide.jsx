@@ -41,7 +41,7 @@ const theme = createMuiTheme({
       'Forum',
       'Raleway'
     ].join(','),
-    align: 'justify'
+    align: 'justify',
   },
   spacing: 10
 });
