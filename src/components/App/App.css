@@ -2,6 +2,7 @@ html,
 body,
 #react-root {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -109,4 +110,8 @@ Form Treatment
 input {
   margin: 5px;
   margin-bottom: 10px;
+}
+
+li {
+  list-style-type: none;
 }
