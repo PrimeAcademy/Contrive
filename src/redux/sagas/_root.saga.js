@@ -6,7 +6,7 @@ import chatSaga from './chat.saga';
 import searchSaga from './search.saga';
 import dropdownSaga from './dropdown.saga';
 import vendorSaga from './vendor.saga';
-
+import filterSaga from './filter.saga';
 // rootSaga is the primary saga.
 // It bundles up all of the other sagas so our project can use them.
 // This is imported in index.js as rootSaga
@@ -23,5 +23,6 @@ export default function* rootSaga() {
     searchSaga(),
     dropdownSaga(),
     vendorSaga(),
+    filterSaga(),
   ]);
 }

@@ -35,6 +35,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 120,
     maxWidth: 300,
   },
+  img: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+  },
 }));
 
 function SearchNetwork() {
@@ -45,30 +49,35 @@ function SearchNetwork() {
   // Grabs information from Global Redex Store
   const features = useSelector((store) => store.features);
   const service = useSelector((store) => store.vendorTypes);
+  const filter = useSelector((store) => store.filter);
+  
+  // //Local store variables that captures from inputs
+  // const [typeId, setTypeId] = useState('');
+  // const [featureId, setFeatureId] = useState('');
+  let typeId = -1
+  let featureId= -1
 
-  //Local store variables that captures from inputs
-  const [specialFeatures, setSpecialFeatures] = useState('');
-  const [vendorTypes, setVendorTypes] = useState('');
-
-  const handleVendorChange = (evt) => {
-    // let newUser = evt.target.value;
-    // if (newUser === '-1'){
-    //   history.push(`/discover`);}
-    // else {
-    // userChange(newUser);
-    // }
+  const handleVendorTypeChange = (evt) => {
+    typeId = evt.target.value;
+    onChange();
   };
 
-  const handleCategoryChange = (evt) => {
-    // let newUser = evt.target.value;
-    // if (newUser === '-1'){
-    //   history.push(`/discover`);}
-    // else {
-    // userChange(newUser);
-    // }
+  const handleSpecialFeatureChange = (evt) => {
+    featureId = evt.target.value;
+    onChange();
   };
+
+  const onChange = () => {
+    dispatch({
+    type: 'FETCH_MATCHING_VENDORS',
+    payload: {
+      typeId: typeId,
+      featureId: featureId,
+    }
+  })};
 
   return (
+    
     <div>
       <main>
         <Box align="center" width="100%">
@@ -80,17 +89,16 @@ function SearchNetwork() {
                 </Box>
               </Typography>
             </Box>
-
+  
             <FormControl className={classes.formControl}>
               <InputLabel id="vendor-type">Vendor Types</InputLabel>
               <Select
                 labelId="vendor-type"
                 id="vendor-type"
                 name="Vendor Types"
-                value={vendorTypes}
-                onChange={(evt) => setVendorTypes(evt.target.value)}
+                onChange={handleVendorTypeChange}
               >
-                {/* <MenuItem value="" disabled> -- Select Vendor Type -- </MenuItem> */}
+                {/* <MenuItem key="-1" value="-1"> -- Select Vendor Type -- </MenuItem> */}
                 {service &&
                   service.length &&
                   service.map((cat, i) => {
@@ -109,8 +117,7 @@ function SearchNetwork() {
                 labelId="special-features"
                 id="special-features"
                 name="Special Features"
-                value={specialFeatures}
-                onChange={(evt) => setSpecialFeatures(evt.target.value)}
+                onChange={handleSpecialFeatureChange}
               >
                 {features &&
                   features.length &&
@@ -124,8 +131,38 @@ function SearchNetwork() {
               </Select>
             </FormControl>
 
+        <Grid container className={classes.root} spacing={2}>
+          <Grid item xs={12}>
+            <Grid container justify="center" spacing={spacing}>
+        
+        {/* <section className="artwork"> */}
+            {
+              // Makes sure artworkList is populated
+              filter && filter.length && 
+              filter.map((vendor, i) => {
+                  return (
+                    <Grid
+                    key = {i}
+                    >
+                    <br></br>
+                    <Typography align="center" variant="h5">{vendor.companyName}</Typography>
+                    <br></br>
+                      <img src={vendor.profilePic} alt={vendor.companyName} className={classes.img} />
+                    <br></br>
+                        <br></br>
+                    </Grid>
+                  
+                  );
+              })              
+            }
+        {/* </section> */}
+            </Grid>
+          </Grid>
+        </Grid>
+
             <SearchBar />
           </Box>
+          <SearchResults />
         </Box>
       </main>
     </div>
